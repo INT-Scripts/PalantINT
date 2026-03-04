@@ -142,6 +142,43 @@ Then navigate to **http://localhost/login** to authenticate.
 
 ---
 
+## 📦 Transferring Data
+
+The database and `data/` directory are **not** stored in Git (they're gitignored). To transfer a working instance to someone else, use the portability script:
+
+### On your machine (sender)
+
+```bash
+# Make sure the DB container is running
+docker compose up -d db
+
+# Export everything into a single archive
+./portability.sh save
+```
+
+This creates a `palantint-transfer-YYYYMMDD-HHMMSS.tar.gz` containing:
+- **PostgreSQL dump** — full schema + all data
+- **`data/assets/profiles/`** — student photos
+- **`data/assets/plans/`** — processed SVG building maps
+- **`data/assets/media/`** — user-uploaded content
+- **`data/scraps/`** — raw JSON scraps, input SVGs
+
+### On the other machine (receiver)
+
+```bash
+# Clone the repo
+git clone --recurse-submodules https://github.com/INT-Scripts/PalantINT.git
+cd PalantINT
+
+# Place the archive here, then import
+./portability.sh load palantint-transfer-*.tar.gz
+
+# Start everything
+docker compose up --watch
+```
+
+---
+
 ## 🗂️ Data Model
 
 ```mermaid
