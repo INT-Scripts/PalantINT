@@ -1,0 +1,29 @@
+services:
+  backend:
+    develop:
+      watch:
+        - action: sync
+          path: ./backend
+          target: /app
+          ignore:
+            - .venv
+            - __pycache__
+            - .pytest_cache
+        - action: rebuild
+          path: ./backend/pyproject.toml
+        - action: rebuild
+          path: ./backend/uv.lock
+
+  frontend:
+    develop:
+      watch:
+        - action: sync
+          path: ./frontend
+          target: /app
+          ignore:
+            - node_modules
+            - .next
+        - action: rebuild
+          path: ./frontend/package.json
+        - action: rebuild
+          path: ./frontend/package-lock.json

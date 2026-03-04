@@ -1,9 +1,9 @@
 [submodule "scripts"]
 	path = scripts
-	url = ./scripts
+	url = https://github.com/INT-Scripts/palantint-scripts.git
 [submodule "backend"]
 	path = backend
-	url = ./backend
+	url = https://github.com/INT-Scripts/palantint-backend.git
 [submodule "frontend"]
 	path = frontend
-	url = ./frontend
+	url = https://github.com/INT-Scripts/palantint-frontend.git

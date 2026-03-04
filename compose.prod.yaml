@@ -1,0 +1,13 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    volumes:
+      - ./data/assets:/app/assets
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    volumes: []
