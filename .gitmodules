@@ -1,3 +1,9 @@
 [submodule "scripts"]
 	path = scripts
 	url = ./scripts
+[submodule "backend"]
+	path = backend
+	url = ./backend
+[submodule "frontend"]
+	path = frontend
+	url = ./frontend
