@@ -11,8 +11,6 @@ services:
             - .pytest_cache
         - action: rebuild
           path: ./backend/pyproject.toml
-        - action: rebuild
-          path: ./backend/uv.lock
 
   frontend:
     develop:

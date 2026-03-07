@@ -1,0 +1,17 @@
+# Ignore data folders
+postgres_data/
+data/
+
+# Ignore virtualenvs and cache
+.venv/
+**/__pycache__/
+**/.pytest_cache/
+
+# Ignore git
+.git/
+.gitmodules
+
+# Ignore other service folders (when building backend)
+# Note: we manually copy what we need in the Dockerfiles
+frontend/
+scripts/

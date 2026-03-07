@@ -51,7 +51,7 @@ do_save() {
     if [ -n "$DB_CONTAINER_NAME" ]; then
         info "Dumping PostgreSQL from container: $DB_CONTAINER_NAME"
         docker exec "$DB_CONTAINER_NAME" \
-            pg_dump -U postgres -d spyint --clean --if-exists \
+            pg_dump -U postgres -d palantint --clean --if-exists \
             > "$tmp_dir/database.sql" 2>/dev/null
         ok "Database dump: $(du -sh "$tmp_dir/database.sql" | cut -f1)"
     else
@@ -137,12 +137,12 @@ do_load() {
 
         if [ -n "$DB_CONTAINER_NAME" ]; then
             docker exec -i "$DB_CONTAINER_NAME" \
-                psql -U postgres -d spyint \
+                psql -U postgres -d palantint \
                 < "$tmp_dir/database.sql" > /dev/null 2>&1
             ok "Database restored."
         else
             err "Could not find Postgres container. Import the SQL manually:"
-            err "  docker exec -i <container> psql -U postgres -d spyint < database.sql"
+            err "  docker exec -i <container> psql -U postgres -d palantint < database.sql"
         fi
     else
         warn "No database.sql in archive. Skipping DB restore."

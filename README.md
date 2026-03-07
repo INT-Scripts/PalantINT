@@ -2,9 +2,9 @@
 
 # 🔮 PalantINT
 
-**Internal OSINT Platform for IMT-BS / Télécom SudParis**
+**High-Performance Data Visualization Platform for IMT-BS / Télécom SudParis**
 
-*A classified intelligence interface from the year 2040.*
+*A refined, brutalist data interface for the modern campus.*
 
 [![Backend](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://github.com/INT-Scripts/palantint-backend)
 [![Frontend](https://img.shields.io/badge/Frontend-Next.js_15-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://github.com/INT-Scripts/palantint-frontend)
@@ -15,46 +15,48 @@
 
 ---
 
-## 👁️ What is PalantINT?
+## About PalantINT
 
-PalantINT unifies disparate campus data sources — student directories, timetables, club listings, and residential maps — into a single, immersive intelligence interface.
+PalantINT unifies disparate campus data sources — student directories, schedules, club listings, and housing maps — into a single, immersive professional interface.
 
-Built with a **Dark Luxury / Intelligence Agency** aesthetic: glassmorphism on abyssal zinc backgrounds, brutalist typography, and thermal-radar building maps.
+Built with a **Dark Luxury & Brutalist** aesthetic: glassmorphism on abyssal zinc backgrounds, sharp geometry, and high-density data grids.
 
 ### Key Features
 
 | Feature | Description |
 |---------|-------------|
-| 🕵️ **Student Profiles** | Aggregated dossiers with photos, schedules, relationships, and media |
-| 🗺️ **Thermal Radar** | Interactive SVG building plans with room-level resident lookup |
-| 📅 **Agenda Intel** | Timetable cross-referencing across students and rooms |
-| 🏛️ **Club Directory** | BDE/BDA/ASINT club listings with member rosters |
-| 🔗 **Social Graph** | Relationship mapping (friends, couples, ex) between students |
-| 📸 **Media Gallery** | Per-student image/video/note attachments |
+| 👤 **Student Profiles** | Comprehensive identities with photos, schedules, relationships, and media. |
+| 🗺️ **Housing Map** | Interactive SVG building plans with room-level resident lookup. |
+| 📅 **Schedule Sync** | Real-time timetable cross-referencing for students and rooms. |
+| 🏛️ **Club Directory** | BDE/BDA/ASINT club listings with full member rosters. |
+| 🔗 **Social Graph** | Relationship mapping (friends, couples, ex) between students. |
+| 📸 **Media Gallery** | Per-student image, video, and note attachments. |
 
 ---
 
 ## 🏗️ Architecture
 
-```
-PalantINT/                    ← You are here (orchestrator)
-├── backend/                  ← 🐍 FastAPI REST API        [submodule]
-├── frontend/                 ← ⚛️  Next.js 15 App Router   [submodule]
-├── scripts/                  ← 🛠️ OSINT Pipeline & Tools   [submodule]
-├── data/                     ← 📦 Persistent volume (assets, scraps)
-├── compose.yaml              ← 🐳 Docker Compose (base)
-├── compose.override.yaml     ← 🔄 Dev overrides (hot-reload)
-├── compose.prod.yaml         ← 🚀 Production overrides
-└── nginx.conf                ← 🌐 Reverse proxy config
+The platform is built using a decentralized **Extract, Transform, Load (ETL)** pipeline and independent submodules.
+
+```text
+PalantINT/
+├── backend/       ← 🐍 FastAPI + DB Models & Alembic
+├── frontend/      ← ⚛️  Next.js 15 App Router
+├── scripts/       ← 🛠️ ETL Pipeline & Maintenance Tools
+├── int-libraries/ ← 📚 Shared SDKs (trombint, casint) [submodule]
+├── data/          ← 📦 Persistent volume (assets, scraps)
+├── compose.yaml   ← 🐳 Docker Compose (base)
+└── nginx.conf     ← 🌐 Reverse proxy config
 ```
 
-Each component lives in its own Git repository, linked here as **submodules**:
+### Component Roles
 
-| Component | Repository | Tech Stack |
-|-----------|-----------|------------|
-| **Backend** | [`INT-Scripts/palantint-backend`](https://github.com/INT-Scripts/palantint-backend) | FastAPI · SQLModel · PostgreSQL · JWT · Bcrypt |
-| **Frontend** | [`INT-Scripts/palantint-frontend`](https://github.com/INT-Scripts/palantint-frontend) | Next.js 15 · React 19 · Tailwind CSS 4 · Shadcn UI |
-| **Scripts** | [`INT-Scripts/palantint-scripts`](https://github.com/INT-Scripts/palantint-scripts) | Rich TUI · HTTPX · BeautifulSoup · OpenCV |
+| Component | Tech Stack | Role |
+|-----------|------------|------|
+| **Backend** | FastAPI · SQLModel | REST API & Central Database logic. |
+| **Frontend** | Next.js 15 · Tailwind 4 | Brutalist glassmorphism interface. |
+| **Scripts** | Python · Questionary TUI | Data ingestion & system maintenance. |
+| **int-libraries** | HTTPX · BeautifulSoup | Standalone generic campus SDKs. |
 
 ---
 
@@ -63,7 +65,7 @@ Each component lives in its own Git repository, linked here as **submodules**:
 ### Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/) & [Docker Compose](https://docs.docker.com/compose/)
-- [Git](https://git-scm.com/) (for submodule cloning)
+- [uv](https://github.com/astral-sh/uv) (for running scripts)
 
 ### Clone
 
@@ -72,179 +74,52 @@ git clone --recurse-submodules https://github.com/INT-Scripts/PalantINT.git
 cd PalantINT
 ```
 
-> Already cloned without submodules? Run: `git submodule update --init --recursive`
-
 ### Development (Hot-Reload)
 
 ```bash
 docker compose up --watch
 ```
 
-The app is served at **http://localhost** via an Nginx reverse proxy:
-- **Frontend**: Proxied from port `3000`
-- **Backend API**: Available at `/api/*`
-- **Static Assets**: Served from `/api/assets/*`
-
-### Production
-
-```bash
-docker compose -f compose.yaml -f compose.prod.yaml up --build
-```
-
-Uses optimized Dockerfiles: the frontend is statically exported and served by Nginx, the backend runs multi-worker Uvicorn.
+The app is served at **http://localhost** via Nginx.
 
 ---
 
-## 🛠️ Data Pipeline
+## 🛠️ Data Pipeline (ETL)
 
-The **scripts** submodule contains a Rich TUI pipeline for scraping and synchronizing all data sources.
+The **scripts** directory contains an interactive ETL pipeline for scraping and synchronizing data sources.
 
 ```bash
 cd scripts/
-uv sync                        # Install dependencies
-uv run palantint-scrape         # Launch the full pipeline
-uv run palantint-scrape --purge # Wipe DB first, then scrape
+uv run palantint-scrape         # Launch the interactive setup wizard
 ```
 
-#### Pipeline Steps
+### Operation Modes
 
-| Step | Description | Requires CAS? |
-|------|-------------|:-:|
-| Purge Database | Drop & recreate all tables | ❌ |
-| Seed Relationships | Insert default types (Amis, En couple, Ex) | ❌ |
-| Scrape Clubs | Fetch BDE/BDA/ASINT listings | ❌ |
-| Scrape TrombINT | Download student directory | ✅ |
-| Backfill Students | Enrich with école/filière data | ✅ |
-| Import Agenda | Ingest timetable JSON scraps | ❌ |
-| Fix Missing Images | Re-download missing profile photos | ✅ |
+*   **Extraction Phase**: Pure web scraping. Connects to school servers and saves raw data as JSON in `data/scraps/`. *No DB required.*
+*   **Load Phase**: Synchronizes JSON files into PostgreSQL. *No internet required.*
+*   **Database Modes**: Incremental (default), Hydrate (re-verify), or Purge (wipe).
+*   **Speed Modes**: Stealth (1s delay), Normal, or Aggressive (0s delay).
 
-CAS-dependent steps require `CAS_USERNAME` and `CAS_PASSWORD` environment variables.
-
-### Other CLI Tools
+### System Tools
 
 ```bash
 uv run palantint-admin <user> <pass>   # Create an admin account
-uv run palantint-svg                    # Process building SVG plans
+uv run palantint-svg                   # Process building SVG plans
+uv run palantint-print list-webprint   # Check campus printers
 ```
 
 ---
 
-## 🔐 Admin Setup
+## 🔐 Account Setup
 
-After the database is populated, create your first admin user:
+Once the database is populated, create an administrator account:
 
 ```bash
 cd scripts/
 uv run palantint-admin admin yourpassword
 ```
 
-Then navigate to **http://localhost/login** to authenticate.
-
----
-
-## 📦 Transferring Data
-
-The database and `data/` directory are **not** stored in Git (they're gitignored). To transfer a working instance to someone else, use the portability script:
-
-### On your machine (sender)
-
-```bash
-# Make sure the DB container is running
-docker compose up -d db
-
-# Export everything into a single archive
-./portability.sh save
-```
-
-This creates a `palantint-transfer-YYYYMMDD-HHMMSS.tar.gz` containing:
-- **PostgreSQL dump** — full schema + all data
-- **`data/assets/profiles/`** — student photos
-- **`data/assets/plans/`** — processed SVG building maps
-- **`data/assets/media/`** — user-uploaded content
-- **`data/scraps/`** — raw JSON scraps, input SVGs
-
-### On the other machine (receiver)
-
-```bash
-# Clone the repo
-git clone --recurse-submodules https://github.com/INT-Scripts/PalantINT.git
-cd PalantINT
-
-# Place the archive here, then import
-./portability.sh load palantint-transfer-*.tar.gz
-
-# Start everything
-docker compose up --watch
-```
-
----
-
-## 🗂️ Data Model
-
-```mermaid
-erDiagram
-    User {
-        uuid id PK
-        string username UK
-        string hashed_password
-        bool is_admin
-    }
-    Student {
-        uuid id PK
-        string trombint_id UK
-        string first_name
-        string last_name
-        string email
-        string ecole
-        string promo
-        string apartment
-    }
-    Club {
-        uuid id PK
-        string name UK
-        string association_of_origin
-        string slug
-    }
-    AgendaEvent {
-        uuid id PK
-        string event_ref_id UK
-        string name
-        datetime start_time
-        datetime end_time
-        string room
-        string professors
-    }
-    Student ||--o{ StudentClub : "belongs to"
-    Club ||--o{ StudentClub : "has members"
-    Student ||--o{ Relationship : "connected"
-    Student ||--o{ Media : "has media"
-    Student ||--o{ StudentAgendaEvent : "attends"
-    AgendaEvent ||--o{ StudentAgendaEvent : "attended by"
-```
-
----
-
-## 🤝 Contributing
-
-1. Fork the relevant submodule repository
-2. Create your feature branch (`git checkout -b feat/amazing-feature`)
-3. Commit your changes (`git commit -m 'feat: add amazing feature'`)
-4. Push to the branch (`git push origin feat/amazing-feature`)
-5. Open a Pull Request
-
-### Working with Submodules
-
-```bash
-# Pull latest changes (including submodule updates)
-git pull
-git submodule update --remote --merge
-
-# After committing inside a submodule, update the root reference
-cd ..
-git add backend  # or frontend, scripts
-git commit -m "chore: update backend submodule ref"
-git push
-```
+Navigate to **http://localhost/account** to manage your profile and access the **Admin Dashboard**.
 
 ---
 
@@ -255,5 +130,5 @@ This project is private and intended for internal use within the INT-Scripts org
 ---
 
 <div align="center">
-<sub>Built with 🖤 by the PalantINT Team — <i>"Rien n'échappe au Palantír."</i></sub>
+<sub>Built with 🖤 by the PalantINT Team</sub>
 </div>
