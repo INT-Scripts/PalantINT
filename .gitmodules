@@ -7,3 +7,6 @@
 [submodule "frontend"]
 	path = frontend
 	url = https://github.com/INT-Scripts/palantint-frontend.git
+[submodule "libs/int-libraries"]
+	path = libs/int-libraries
+	url = https://github.com/INT-Scripts/int-libraries.git
