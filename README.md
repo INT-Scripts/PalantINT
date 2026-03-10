@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="frontend/public/palantint.svg" width="200" alt="PalantINT Logo" />
+
 # 🔮 PalantINT
 
 **High-Performance Data Visualization Platform for IMT-BS / Télécom SudParis**
@@ -26,11 +28,11 @@ Built with a **Dark Luxury & Brutalist** aesthetic: glassmorphism on abyssal zin
 | Feature | Description |
 |---------|-------------|
 | 👤 **Student Profiles** | Comprehensive identities with photos, schedules, relationships, and media. |
-| 🗺️ **Housing Map** | Interactive SVG building plans with room-level resident lookup. |
+| 🏰 **3D Digital Twin** | WebGL structural wireframes of residence buildings with zero-lag interaction. |
+| 🛡️ **OSINT Vault** | Portable backup system for manual research, social graphs, and map calibrations. |
 | 📅 **Schedule Sync** | Real-time timetable cross-referencing for students and rooms. |
-| 🏛️ **Club Directory** | BDE/BDA/ASINT club listings with full member rosters. |
-| 🔗 **Social Graph** | Relationship mapping (friends, couples, ex) between students. |
-| 📸 **Media Gallery** | Per-student image, video, and note attachments. |
+| 🏛️ **Organization Hub** | Branded club profiles with full member rosters and event logs. |
+| 📸 **Comms Log** | Unified student-specific intelligence gallery for images, videos, and notes. |
 
 ---
 
@@ -40,13 +42,13 @@ The platform is built using a decentralized **Extract, Transform, Load (ETL)** p
 
 ```text
 PalantINT/
-├── backend/       ← 🐍 FastAPI + DB Models & Alembic
-├── frontend/      ← ⚛️  Next.js 15 App Router
-├── scripts/       ← 🛠️ ETL Pipeline & Maintenance Tools
-├── int-libraries/ ← 📚 Shared SDKs (trombint, casint) [submodule]
-├── data/          ← 📦 Persistent volume (assets, scraps)
-├── compose.yaml   ← 🐳 Docker Compose (base)
-└── nginx.conf     ← 🌐 Reverse proxy config
+├── backend/       ← 🐍 FastAPI + DB Models & REST API
+├── frontend/      ← ⚛️  Next.js 15 + Three.js WebGL Engine
+├── scripts/       ← 🛠️  Synchronization Pipeline & Vault Tools
+├── int-libraries/ ← 📚  Shared SDKs (trombint, casint) [submodule]
+├── data/          ← 📦  Persistent volume (assets, vault, scraps)
+├── compose.yaml   ← 🐳  Docker Compose (base)
+└── nginx.conf     ← 🌐  Reverse proxy config
 ```
 
 ### Component Roles
@@ -54,72 +56,46 @@ PalantINT/
 | Component | Tech Stack | Role |
 |-----------|------------|------|
 | **Backend** | FastAPI · SQLModel | REST API & Central Database logic. |
-| **Frontend** | Next.js 15 · Tailwind 4 | Brutalist glassmorphism interface. |
-| **Scripts** | Python · Questionary TUI | Data ingestion & system maintenance. |
+| **Frontend** | Next.js 15 · Three.js | Brutalist interface & 3D visualization. |
+| **Scripts** | Python · Rich TUI | Data synchronization & vault management. |
 | **int-libraries** | HTTPX · BeautifulSoup | Standalone generic campus SDKs. |
 
 ---
 
-## 🚀 Getting Started
+## 🛠️ Data Synchronization
+
+The **scripts** directory contains the interactive command center for synchronizing data sources and managing the vault.
+
+```bash
+cd scripts/
+uv run palantint         # Launch the Unified Command Center
+```
+
+### Operational Lifecycle
+
+*   **Scraping Phase**: Harvesting raw web data into `data/scraps/`. *Offline-safe once complete.*
+*   **Loading Phase**: Hydrating the database from local scraps and the OSINT vault.
+*   **Vault Phase**: Automatic snapshots of manual research into `data/exports/`.
+*   **Strategies**: 
+    *   **Incremental**: Add new data while preserving all existing records.
+    *   **Refresh**: Deep-update of all subjects from the web.
+    *   **Wipe & Reload**: Full database reset (Vault restore ensures research persistence).
+
+---
+
+## 🔐 Deployment
 
 ### Prerequisites
-
 - [Docker](https://docs.docker.com/get-docker/) & [Docker Compose](https://docs.docker.com/compose/)
-- [uv](https://github.com/astral-sh/uv) (for running scripts)
+- [uv](https://github.com/astral-sh/uv) (for pipeline execution)
 
-### Clone
-
+### Setup
 ```bash
 git clone --recurse-submodules https://github.com/INT-Scripts/PalantINT.git
-cd PalantINT
-```
-
-### Development (Hot-Reload)
-
-```bash
-docker compose up --watch
-```
-
-The app is served at **http://localhost** via Nginx.
-
----
-
-## 🛠️ Data Pipeline (ETL)
-
-The **scripts** directory contains an interactive ETL pipeline for scraping and synchronizing data sources.
-
-```bash
+docker compose up -d
 cd scripts/
-uv run palantint-scrape         # Launch the interactive setup wizard
+uv run palantint-admin admin mypassword # Create root access
 ```
-
-### Operation Modes
-
-*   **Extraction Phase**: Pure web scraping. Connects to school servers and saves raw data as JSON in `data/scraps/`. *No DB required.*
-*   **Load Phase**: Synchronizes JSON files into PostgreSQL. *No internet required.*
-*   **Database Modes**: Incremental (default), Hydrate (re-verify), or Purge (wipe).
-*   **Speed Modes**: Stealth (1s delay), Normal, or Aggressive (0s delay).
-
-### System Tools
-
-```bash
-uv run palantint-admin <user> <pass>   # Create an admin account
-uv run palantint-svg                   # Process building SVG plans
-uv run palantint-print list-webprint   # Check campus printers
-```
-
----
-
-## 🔐 Account Setup
-
-Once the database is populated, create an administrator account:
-
-```bash
-cd scripts/
-uv run palantint-admin admin yourpassword
-```
-
-Navigate to **http://localhost/account** to manage your profile and access the **Admin Dashboard**.
 
 ---
 

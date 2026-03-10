@@ -14,6 +14,7 @@ Nous construisons l'UI sur une échelle de Zinc (`zinc-950` quasi-noir) avec des
 
 - **Le Vide (Fondation) :** `bg-zinc-950`. L'espace négatif est utilisé pour la clarté.
 - **La Vitre (Glassmorphism) :** Les conteneurs utilisent des surfaces de verre fumé (`bg-zinc-900/40 backdrop-blur-xl border border-zinc-800/60`).
+- **Arêtes Tranchantes (Brutalisme) :** AUCUN arrondi. Toutes les bordures doivent être strictement carrées (`rounded-none`). L'arrondi est banni pour renforcer l'aspect outil technique.
 - **Lumière Atmosphérique :** Grain texturisé et orbes lumineuses discrètes sous le verre.
 
 ### 🩸 Accords de Couleurs
@@ -23,16 +24,19 @@ Nous construisons l'UI sur une échelle de Zinc (`zinc-950` quasi-noir) avec des
 
 ---
 
-## 🔤 Typographie : Clarté et Modernité
+## 🔤 Typographie & Langage : Clarté et Professionnalisme
 
 - **Titres (Display) :** Brutaliste, étendue (Extended) ou géométrique.
-- **Corps de texte (Body) :** Mono-espacée (Monospace) pour les données techniques, pour un aspect précis et professionnel.
+- **Corps de texte (Body) :** Mono-espacée (Inter/Monospace) pour les données techniques.
+- **Langage Naturel :** Utiliser des mots normaux et professionnels. Éviter le jargon technique dramatique (ex: "Déployer," "Séquence," "Extraction") et le *snake_case* dans l'interface utilisateur.
+- **Universalité :** Cette règle de langage s'applique à **TOUTES** les interfaces, y compris les outils en ligne de commande (CLI) et les logs de synchronisation. Un outil haut de gamme parle un langage humain clair.
 
 ---
 
 ## 📐 Composantes Techniques
 
-- **`<DataGrid />`** : Une grille de données haute densité, monospace, avec édition directe. Efficacité maximale.
+- **`<DataGrid />`** : Une grille de données haute densité, monospace, avec édition directe.
+- **`<BuildingModel />`** : Un moteur WebGL (Three.js) rendu en fil de fer (wireframe) pour visualiser la structure physique des bâtiments.
+- **`<InteractiveMap />`** : Plans SVG dynamiques avec manipulation directe du DOM pour une performance instantanée.
 - **`<Schedule />`** : Un flux d'événements clair et chronologique.
-- **`<Avatar />`** : Portraits nets avec effet de lueur.
 - **Dégradés et Bruitages CSS :** Grain CSS en overlay pour une texture premium.
