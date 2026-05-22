@@ -5,6 +5,7 @@ services:
       dockerfile: backend/Dockerfile.prod
     volumes:
       - ./data/assets:/app/assets
+      - ./data/private_assets:/app/private_assets
 
   frontend:
     build:

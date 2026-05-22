@@ -29,6 +29,7 @@ services:
         condition: service_healthy
     volumes:
       - ./data/assets:/app/assets
+      - ./data/private_assets:/app/private_assets
 
   frontend:
     build:
