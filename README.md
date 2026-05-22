@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="frontend/public/palantint.svg" width="200" alt="PalantINT Logo" />
+<img src="palantint.svg" width="200" alt="PalantINT Logo" />
 
-# 🔮 PalantINT
+# PalantINT
 
 **High-Performance Data Visualization Platform for IMT-BS / Télécom SudParis**
 
