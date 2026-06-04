@@ -1,8 +1,8 @@
 services:
   backend:
     build:
-      context: .
-      dockerfile: backend/Dockerfile.prod
+      context: ./backend
+      target: production
     volumes:
       - ./data/assets:/app/assets
       - ./data/private_assets:/app/private_assets
@@ -10,5 +10,5 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.prod
+      target: production
     volumes: []
