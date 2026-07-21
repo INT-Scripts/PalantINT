@@ -61,3 +61,109 @@ Which features should be implemented first?
 1.  **Laundry Radar** (High daily utility)
 2.  **Silent Background Sync** (Technical robustness)
 3.  **Intersect Meeting Finder** (Social utility)
+
+---
+
+## 🌐 INT Portal — Public Features
+*No authentication required. Built from public sources only.*
+
+### 📚 1. Course Catalog Browser
+A fully searchable, filterable course module catalog — far more usable than the official scattered PDFs.
+
+- **Data source:** Scrape https://enseignements.telecom-sudparis.eu/ (public, no login) for module codes, titles, ECTS, descriptions, professors, and semester.
+- **Curriculum map integration:** Cross-link with the program schema at https://www.telecom-sudparis.eu/SchemaFormation/ to display each module's position in the degree path (which year, which track, prerequisites).
+- **Features:** Filter by year (EI1/EI2/EI3), specialization/parcours, ECTS range, professor name, module code prefix. Full-text search on module descriptions.
+- **Auto-update:** Periodic public scrape of the teaching catalog — no private access needed.
+
+---
+
+### 🔬 2. Research Lab Directory
+A visual explorer for all TSP/IMT-BS research labs, their themes, faculty, and publications.
+
+- **Data source:** Public lab pages on telecom-sudparis.eu and imtbs-tsp.eu, plus HAL open-access API (hal.science) for recent publications by affiliated authors.
+- **Features:** Click a lab → see research axes, affiliated professors, recent papers (with DOI links), PhD positions, and industrial partnerships. Filter by theme (networks, AI, security, etc.).
+- **Useful for:** Prospective PhD students, industry partners, and students choosing specializations.
+
+---
+
+### 🤝 3. Partner Company Map
+A visual world map of the school's industrial and academic partners.
+
+- **Data source:** Public partnership pages on both school sites — company names, logos, and sectors are listed publicly.
+- **Features:** Interactive globe/map filtered by sector (telecom, finance, defense, consulting), partnership type (research, internship, hiring), and country. Click a company → see open offers if any.
+- **Useful for:** Students targeting internship applications, especially international ones.
+
+---
+
+### 📰 4. News & Events Aggregator
+A single unified feed merging all public communications from both schools.
+
+- **Data source:** Public RSS feeds and news pages from telecom-sudparis.eu, imtbs-tsp.eu, association pages, social media (public accounts).
+- **Features:** Filter by theme (events, alumni spotlights, research, admin, associations). Timeline view, keyword search, and RSS export for subscribers.
+- **Why it matters:** The school runs ~5 separate websites that never appear together. Students miss announcements constantly.
+
+---
+
+### 🌍 5. Exchange Program Browser
+An interactive map of partner universities for Erasmus and international exchange.
+
+- **Data source:** Public partner university lists on the school sites (PDF/HTML tables on international pages).
+- **Features:** World map pinning each destination, filterable by language of instruction, GPA requirement, semester availability (S1/S2/full year), and region. Student testimonials submitted via a simple form (opt-in, no login needed for reading).
+- **Useful for:** 2nd-year students making exchange choices — currently this data is buried in PDFs.
+
+---
+
+### 💼 6. Internship & Job Offers Aggregator
+A better UI over the public internship offer listings the school already posts.
+
+- **Data source:** School's public job board / career portal (public listings, no login for reading on most deployments).
+- **Features:** Saved searches, email alert subscriptions, offer tagging by domain/duration/location, and direct application link. Mobile-friendly card layout vs the current table-based portal.
+
+---
+
+### 🍽️ 7. Campus Restaurant Menu Viewer
+Daily and weekly menus for campus dining with diet filters.
+
+- **Data source:** Crous semi-public API (api.crous-montpellier.fr pattern, or direct HTML scrape of the posted weekly menus). Menus are public.
+- **Features:** Weekly view, allergen/diet filters (végétarien, sans gluten, etc.), anonymous dish rating, and a "vote for tomorrow" feature. Optionally notify when a preferred dish is on the menu.
+- **Fastest win:** Crous publishes menus publicly — this is a 1-day build with high daily usage.
+
+---
+
+### 🏆 8. Alumni Tracker (Public)
+A "where are our alumni now" explorer built from public data.
+
+- **Data source:** School-published alumni spotlights and testimonials (publicly posted on the school site), supplemented by opt-in alumni self-submission form.
+- **Features:** Filter by graduation year, sector, company, country. Shows career paths (EI1 → internship → first job → current). No private data — only self-submitted or school-published profiles.
+
+---
+
+### 📊 9. Admissions Stats Dashboard
+Historical admissions data visualized for prospective students.
+
+- **Data source:** Public SIGEM rankings data, CPGE acceptance statistics, and school-published class profiles (all public yearly reports).
+- **Features:** Charts showing acceptance rate trends by filière (MP, PC, PSI, TSI, etc.), evolution of class median rank, and peer school comparisons. Useful for guidance counselors and applicants assessing realistic targets.
+
+---
+
+### 📅 10. Public Events Calendar
+All open campus events in one place.
+
+- **Data source:** Public pages of student associations, school social media (public accounts), and official event announcements.
+- **Features:** Filterable unified calendar (career fairs, hackathons, open days, concerts, sports), iCal/Google Calendar export, and an open event submission form for associations to post directly. No private data — entirely community-submitted and publicly sourced.
+
+---
+
+### 🎯 Priority for INT Portal Public Features
+| # | Feature | Effort | Daily Impact |
+|---|---------|--------|-------------|
+| 7 | Campus Restaurant Menu | ⭐ Low | ⭐⭐⭐ High |
+| 1 | Course Catalog Browser | ⭐⭐ Med | ⭐⭐⭐ High |
+| 9 | Admissions Dashboard | ⭐ Low | ⭐⭐ Med (prospective) |
+| 5 | Exchange Program Browser | ⭐⭐ Med | ⭐⭐⭐ High (annual) |
+| 4 | News Aggregator | ⭐ Low | ⭐⭐ Med |
+| 2 | Research Lab Directory | ⭐⭐ Med | ⭐ Low (niche) |
+| 3 | Partner Company Map | ⭐⭐ Med | ⭐⭐ Med |
+| 6 | Job Offers Aggregator | ⭐⭐ Med | ⭐⭐ Med |
+| 10 | Public Events Calendar | ⭐⭐ Med | ⭐⭐ Med |
+| 8 | Alumni Tracker | ⭐⭐⭐ High | ⭐ Low |

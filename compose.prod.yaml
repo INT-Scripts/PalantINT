@@ -3,12 +3,8 @@ services:
     build:
       context: ./backend
       target: production
-    volumes:
-      - ./data/assets:/app/assets
-      - ./data/private_assets:/app/private_assets
 
   frontend:
     build:
       context: ./frontend
       target: production
-    volumes: []
