@@ -24,7 +24,6 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       SECRET_KEY: ${SECRET_KEY}
-      CORS_ORIGINS: ${CORS_ORIGINS}
       MCP_PALANTINT_URL: http://localhost:3000
       MCP_SERVICE_TOKEN: ${MCP_SERVICE_TOKEN:-internal_mcp_secret_change_me}
     ports:
@@ -41,8 +40,6 @@ services:
       context: ./frontend
       target: production
     restart: unless-stopped
-    environment:
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
     depends_on:
       - backend
 
