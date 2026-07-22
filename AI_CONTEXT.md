@@ -1,36 +1,51 @@
 # PalantINT & INT Portal — Technical Architecture & Deep AI Context
 
-Dernière mise à jour : 2026-07-22 (Architecture bicipale : PalantINT Private OSINT vs. INT Portal Public Space)
-
----
+Dernière mise à jour : 2026-07-22 (Architecture bicipale, Mermaid Diagram & Separation Public/Privé)
 
 ## 👁️ Vision & Architecture à Deux Espaces
 
-Le projet unifie deux applications distinctes partageant un backend FastAPI et une base de données PostgreSQL commune :
+Le projet unifie deux applications distinctes partageant un backend FastAPI et une base de données PostgreSQL 16 commune :
 
+```mermaid
+flowchart TD
+    Proxy["Nginx Proxy / API Gateway"]
+    
+    subgraph INTPortal["INT Portal (Public Space)"]
+        PubAPI["Public FastAPI Router (Rate Limited)"]
+        Laundry["Live Laundry Telemetry (/laundry)"]
+        Housing["Housing Specs & Tariffs (/apartments)"]
+        Clubs["Accredited Clubs (/clubs)"]
+        Plans["Static Floor Plans SVG (/assets/plans)"]
+        
+        PubAPI --> Laundry
+        PubAPI --> Housing
+        PubAPI --> Clubs
+        PubAPI --> Plans
+    end
+
+    subgraph PalantINT["PalantINT (Private OSINT Space)"]
+        PrivAPI["Private FastAPI Router (JWT + Fernet AES-128)"]
+        Directory["Student Directory & Trombint"]
+        Occupants["Occupied Apartments Mapping"]
+        Graph["Network & Relationship Graph"]
+        Admin["Admin & Ingest Vault Pipeline"]
+        
+        PrivAPI --> Directory
+        PrivAPI --> Occupants
+        PrivAPI --> Graph
+        PrivAPI --> Admin
+    end
+
+    Proxy -->|"/api/public & /assets"| PubAPI
+    Proxy -->|"/api/private"| PrivAPI
+    PubAPI --> DB[("PostgreSQL Database")]
+    PrivAPI --> DB
 ```
-                        ┌─────────────────────────────────────────┐
-                        │              Nginx Proxy                │
-                        └────┬───────────────────────────────┬────┘
-                             │                               │
-                /api/private │                               │ /api/public & /assets
-                             ▼                               ▼
-       ┌───────────────────────────────┐           ┌───────────────────────────────┐
-       │   PalantINT (Espace Privé)    │           │    INT Portal (Espace Public)  │
-       ├───────────────────────────────┤           ├───────────────────────────────┤
-       │ • Dashboard OSINT & Annuaire  │           │ • Live Laundry Telemetry      │
-       │ • Carte 3D & Occupation Room  │           │ • Housing Pricing & Specs     │
-       │ • Trombinoscope & Social Log  │           │ • Accredited Clubs & Orgs     │
-       │ • Theme: Brutalist Zinc-950   │           │ • Theme: Warm Ivory & Sand    │
-       └───────────────────────────────┘           └───────────────────────────────┘
-```
 
----
+## 🏛️ INT Portal (Espace Public)
 
-## 🏛️ 1. INT Portal (Espace Public)
-
-### Rôle & Public
-Le portail citoyen tout-en-un accessible librement par tous les étudiants, intervenants et visiteurs du campus sans authentification.
+### Rôle & Vision
+Le portail citoyen tout-en-un accessible librement par tous les étudiants, intervenants et visiteurs du campus **IMT-BS / Télécom SudParis** sans aucune authentification requise.
 
 ### Design System & Esthétique
 * **Palette** : Warm Ivory & Sand (`bg-stone-50` / `bg-stone-900` en mode sombre).
@@ -44,25 +59,21 @@ Le portail citoyen tout-en-un accessible librement par tous les étudiants, inte
 3. **Répertoire du Logement (`/apartments`)** : Catalogue interactif des chambres Maisel (surfaces en m², tarifs de base, calculs boursier/non-boursier, critères PMR) via `/api/students/apartments/details`.
 4. **Annuaire des Associations (`/clubs`)** : Répertoire classé par association parente (BDE, BDA, ASINT...) avec tiroir modal de détails et bouclier de protection de la vie privée (`ShieldAlert`).
 
----
+## 👁️ PalantINT (Espace Privé OSINT)
 
-## 👁️ 2. PalantINT (Espace Privé OSINT)
-
-### Rôle & Public
+### Rôle & Vision
 Plateforme d'analyse, d'administration et de cartographie haute précision réservée aux opérateurs et administrateurs autorisés.
 
 ### Design System & Esthétique
 * **Palette** : Luxe Professionnel Brutaliste (Zinc-950, néons sombres, DataGrids haute densité).
-* **Composants** : Jumeau numérique 3D (`BuildingModel`) via Three.js, cartographie vectorielle interactive SVG avec bypass de cycle React pour 60FPS.
+* **Interactivité & WebGL** : Jumeau numérique 3D (`BuildingModel`) via Three.js pour le rendu 3D des bâtiments résidentiels. Manipulation directe du DOM (DOM Refs + `setAttribute`) pour les cartes SVG afin de bypasser le cycle React et garantir 60FPS.
 
 ### Modules Privés Principaux
 1. **Annuaire Etudiant & Trombinoscope** : Recherche globale avec photos de profil (`/students/{id}/image`).
 2. **Occupants des Logements (`/palantint/apartments`)** : Cartographie nominative associant chaque numéro de chambre à l'identité de son étudiant occupant (`/students/apartments/occupied`).
-3. **Graph & Relations (`/palantint/network`)** : Graphe des liens d'amitié, promo et associations.
-4. **Système de Notifications (`/notifications/laundry/subscribe`)** : Alarmes automatiques de libération de machines.
-5. **Panneau Administration (`/palantint/admin`)** : Ingestion de données, gestion du Vault et calibrations de cartes.
-
----
+3. **Graph & Relations (`/palantint/network`)** : Graphe des liens d'amitié, promo et associations (`StudentRelationship`).
+4. **Système de Notifications (`/notifications/laundry/subscribe`)** : Alarmes automatiques de libération de machines réservées aux utilisateurs connectés.
+5. **Panneau Administration (`/palantint/admin`)** : Ingestion de données, gestion du Vault et calibrations de cartes (`MapMetadata`).
 
 ## 🛡️ Séparation Strictement Imposée Backend (Public / Private)
 
@@ -70,35 +81,61 @@ Le backend FastAPI (`backend/src/main.py`) sépare hermétiquement les deux cont
 
 ### Routes Publics (`public_router`, pas d'auth)
 * **Endpoints** : `/clubs`, `/class-groups`, `/laundry/{building}`, `/students/apartments/details`, `/assets/*`.
-* **Garantie** : Protégés par rate-limiting (`rate_limit_dep`). **Aucune PII (Personally Identifiable Information)** n'est retournée. Les listes de membres, photos d'étudiants et informations nominatives en sont strictement exclues.
+* **Garantie** : Protégés par rate-limiting (`rate_limit_dep`). **Aucune PII (Personally Identifiable Information)** n'est retournée. Les listes de membres, photos d'étudiants et informations nominatives en sont strictly exclues.
 
 ### Routes Privées (`private_router`, auth requise)
 * **Endpoints** : `/private/users/*`, `/private/students/occupied`, `/private/notifications/*`, `/private/admin/*`.
-* **Garantie** : Injection obligatoire de la dépendance JWT `require_user_query_token`. Chiffrement AES-128 (Fernet) pour les secrets d'accès.
+* **Garantie** : Injection obligatoire de la dépendance JWT `require_user_query_token`. Chiffrement symétrique **Fernet (AES-128)** pour le stockage sécurisé des identifiants CAS.
 
----
-
-## 🏗️ Architecture Technique Global
+## 🏗️ Architecture Technique & Pipeline ETL
 
 ### 🐍 Backend : FastAPI & SQLModel
-* **Moteur** : FastAPI async (`uv`).
-* **Base de données** : PostgreSQL 16 + SQLModel (SQLAlchemy + Pydantic v2) + Alembic.
-* **Localisation** : `/backend`.
+* **Architecture** : REST API Asynchrone.
+* **Modèles** : SQLModel (SQLAlchemy + Pydantic v2) dans `backend/src/db/models.py`.
+* **Migrations** : Alembic pour le versioning du schéma PostgreSQL 16.
+* **Sécurité** : JWT + Fernet (AES-128).
 
-### ⚛️ Frontend : Next.js 15 (App Router)
-* **Sous-module Git** : Maintenu dans `/frontend` (`INT-Scripts/palantint-frontend`).
-* **Routes App** :
-  * `src/app/(portal)` -> INT Portal (Espace Public).
-  * `src/app/(palantint)` -> PalantINT (Espace Privé).
+### ⚛️ Frontend : Next.js 15
+* **Moteur** : React 19 + App Router (sous-module Git `INT-Scripts/palantint-frontend`).
+* **WebGL** : Three.js pour le rendu 3D des bâtiments résidentiels.
+* **Styles** : Tailwind CSS 4. Mode sombre brutaliste sur Zinc-950 pour PalantINT, Warm Ivory & Sand pour INT Portal.
 
-### 🛠️ Scripts & Pipeline ETL
-* **Scrapers & Loaders** : Fichiers dans `/scripts` alimentant `data/scraps/` et PostgreSQL.
-* **Vault Backup** : Fichiers dans `/data/exports/` contenant les sauvegardes à versionner sous Git.
+### 🛠️ Scripts & Pipeline ETL (Synchronisation)
+* **Harvest (Scrapers)** : Extraient les données brutes (Trombi, Agenda, MiNET) vers JSON dans `data/scraps/`. *Indépendants de la base de données.*
+* **Ingest (Loaders)** : Synchronisent les JSON vers PostgreSQL. Gèrent la fusion (Merge) des données web avec les identités locales.
+* **Vault (Backup)** : Système de sauvegarde portable dans `data/exports/`. Archive la recherche manuelle (Relations, Socials, Notes) et les calibrations de cartes.
+* **TUI** : Interface interactive CLI via `questionary` et `rich`.
 
----
+## 🗃️ Modèle de Données & Lifecycles
 
-## 🗃️ Lifecycles des Données
+### 1. Hard Infrastructure (Maps)
+* **Table** : `MapMetadata`. Coordonnées de calibration 2-Pilliers.
+* **Handling** : Source de vérité DB. Exportée vers `maps.json`. Restaurée en premier pour l'ancrage spatial.
 
-1. **Hard Infrastructure (Maps)** : `MapMetadata` stocké en base et exporté dans `maps.json`.
-2. **Human Intelligence (OSINT)** : `SocialLink`, `StudentRelationship`, `Media` — Données créées par l'utilisateur, protégées par le Vault.
-3. **External Subjects (Directory)** : `Student`, `Club` — Données web synchronisées avec marquage `is_active: false` en cas de disparition.
+### 2. Human Intelligence (OSINT Research)
+* **Tables** : `SocialLink`, `StudentRelationship`, `Media` (Comms Log).
+* **Handling** : Données créées par l'utilisateur. **Cruciales.** Protégées par le Vault (`data/exports/`). Ne sont jamais écrasées par un scrape automatisé.
+
+### 3. External Subjects (Directory)
+* **Tables** : `Student`, `Club`, `StudentClub`.
+* **Handling** : Données issues du web. Hydratation (Upsert). Si un sujet disparaît du web, il est marqué `is_active: false` pour préserver ses notes OSINT.
+
+## 📟 Manuel d'Exploitation
+
+### Installation & CLI
+```bash
+# Dans PalantINT/scripts
+uv sync
+uv run palantint # Interface interactive TUI
+```
+
+### Mandat de Langage
+Toute interaction avec l'utilisateur (Web ou CLI) doit utiliser un **Langage Naturel Professionnel**. 
+* ❌ "Deploy Operative", "Extraction Velocity", "ID_REF"
+* ✅ "Ajouter un membre", "Vitesse de téléchargement", "Identifiant"
+
+## 📂 Structure des Dossiers
+* `/backend` : Logique API FastAPI, schémas SQLModel et sécurité.
+* `/frontend` : Interface Next.js 15 (Espace Public Portal & Espace Privé PalantINT).
+* `/scripts` : Outils de maintenance CLI, scrapers et pipeline ETL.
+* `/data/exports` : Le **Vault**. Contient les fichiers JSON de sauvegarde à commiter.
