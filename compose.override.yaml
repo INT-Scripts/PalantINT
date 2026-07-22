@@ -1,5 +1,7 @@
 services:
   backend:
+    build:
+      target: development
     develop:
       watch:
         - action: sync
@@ -13,6 +15,8 @@ services:
           path: ./backend/pyproject.toml
 
   frontend:
+    build:
+      target: development
     develop:
       watch:
         - action: sync
