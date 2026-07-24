@@ -101,7 +101,7 @@ Le backend FastAPI (`backend/src/main.py`) sépare hermétiquement les deux cont
 * **Styles** : Tailwind CSS 4. Mode sombre brutaliste sur Zinc-950 pour PalantINT, Warm Ivory & Sand pour INT Portal.
 
 ### 🛠️ Scripts & Pipeline ETL (Synchronisation)
-* **Harvest (Scrapers)** : Extraient les données brutes (Trombi, Agenda, MiNET) vers JSON dans `data/scraps/`. *Indépendants de la base de données.*
+* **Harvest (Scrapers)** : Extraient les données brutes (Trombi, Agenda, MiNET) vers JSON dans `data/scraps/auto/` (les données manuelles étant dans `data/scraps/manual/`). *Indépendants de la base de données.*
 * **Ingest (Loaders)** : Synchronisent les JSON vers PostgreSQL. Gèrent la fusion (Merge) des données web avec les identités locales.
 * **Vault (Backup)** : Système de sauvegarde portable dans `data/exports/`. Archive la recherche manuelle (Relations, Socials, Notes) et les calibrations de cartes.
 * **TUI** : Interface interactive CLI via `questionary` et `rich`.
@@ -134,8 +134,31 @@ Toute interaction avec l'utilisateur (Web ou CLI) doit utiliser un **Langage Nat
 * ❌ "Deploy Operative", "Extraction Velocity", "ID_REF"
 * ✅ "Ajouter un membre", "Vitesse de téléchargement", "Identifiant"
 
-## 📂 Structure des Dossiers
-* `/backend` : Logique API FastAPI, schémas SQLModel et sécurité.
-* `/frontend` : Interface Next.js 15 (Espace Public Portal & Espace Privé PalantINT).
-* `/scripts` : Outils de maintenance CLI, scrapers et pipeline ETL.
-* `/data/exports` : Le **Vault**. Contient les fichiers JSON de sauvegarde à commiter.
+## 📂 Structure des Dossiers & Contrats de Données
+
+```
+data/
+├── exports/              ← 🔒 Vault (données utilisateur/OSINT persistantes : maps.json, etc.)
+├── assets/               ← 🎨 Ressources statiques web (plans SVG transformés, 3D tiles, logos)
+└── scraps/               ← 📦 Données sources (découplées en auto/ et manual/)
+    ├── auto/             ← 🤖 Données scrapées / générées par scripts
+    │   ├── agenda/       ← Emplois du temps JSON (agenda.py)
+    │   ├── clubs.json    ← Liste des associations (clubs.py)
+    │   ├── groupes.json  ← Appartenance aux promotions/groupes (groupes.py)
+    │   ├── logements.json← Fiches techniques chambres Maisel (maisel.py)
+    │   ├── students.json ← Annuaire étudiant trombi (trombint.py)
+    │   └── processing_temp/ ← Cache temporaire d'extraction 3D
+    └── manual/           ← ✍️ Données sources fournies manuellement
+        ├── apartments.csv / txt ← Référentiel des chambres
+        ├── foyer_map.csv  ← Mapping salles/associations Foyer
+        ├── input_svgs/   ← Dessins vectoriels bruts des plans (.svg)
+        ├── input_gltf/   ← Modèles 3D bruts (.gltf.zip)
+        ├── metadata/     ← Fichiers de calibration des plans
+        └── compare/      ← Jeux de données de comparaison
+```
+
+> [!IMPORTANT]
+> **Règle d'import des chemins Python** :
+> Ne JAMAIS coder en dur les chemins vers `data/`. Importer systématiquement les constantes centralisées depuis `palantint_scripts.config` :
+> `from palantint_scripts.config import SCRAPS_AUTO_DIR, SCRAPS_MANUAL_DIR, EXPORTS_DIR, ASSETS_DIR, PLANS_DIR`
+

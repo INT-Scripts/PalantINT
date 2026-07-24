@@ -73,7 +73,7 @@ uv run palantint         # Launch the Unified Command Center
 
 ### Operational Lifecycle
 
-*   **Scraping Phase**: Harvesting raw web data into `data/scraps/`. *Offline-safe once complete.*
+*   **Scraping Phase**: Harvesting scraped data into `data/scraps/auto/` and using manual input files in `data/scraps/manual/`. *Offline-safe once complete.*
 *   **Loading Phase**: Hydrating the database from local scraps and the OSINT vault.
 *   **Vault Phase**: Automatic snapshots of manual research into `data/exports/`.
 *   **Strategies**: 

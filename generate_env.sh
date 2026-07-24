@@ -1,6 +1,8 @@
+#!/usr/bin/env bash
+set -e
+
+cat <<EOF > .env
 # PalantINT Environment Variables
-# Copy this file to .env and fill in real values.
-# NEVER commit .env to version control.
 
 # ── Campus CAS Credentials (Scrapers & Ingest Pipeline) ─────────────────────
 CAS_USERNAME=
@@ -9,11 +11,14 @@ CAS_PASSWORD=
 # ── Database ────────────────────────────────────────────────────────────────
 POSTGRES_DB=palantint
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=CHANGE_ME_TO_A_STRONG_PASSWORD
+POSTGRES_PASSWORD=$(openssl rand -hex 24)
 
 # ── Backend Security ────────────────────────────────────────────────────────
-# Secret key used for JWT signing. Generate with: python -c "import secrets; print(secrets.token_urlsafe(64))"
-SECRET_KEY=CHANGE_ME_TO_A_RANDOM_SECRET
+# Secret key used for JWT signing.
+SECRET_KEY=$(openssl rand -hex 48)
 
 # MCP Configuration (Internal credentials for AI agent tool access)
-MCP_SERVICE_TOKEN=internal_mcp_secret_change_me
+MCP_SERVICE_TOKEN=$(openssl rand -hex 24)
+EOF
+
+echo ".env file generated successfully!"
