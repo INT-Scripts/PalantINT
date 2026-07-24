@@ -4,6 +4,9 @@ set -e
 cat <<EOF > .env
 # PalantINT Environment Variables
 
+# ── Network & Proxy ─────────────────────────────────────────────────────────
+PROXY_PORT=80
+
 # ── Campus CAS Credentials (Scrapers & Ingest Pipeline) ─────────────────────
 CAS_USERNAME=
 CAS_PASSWORD=
