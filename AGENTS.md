@@ -108,17 +108,53 @@ Le backend FastAPI (`backend/src/main.py`) sépare hermétiquement les deux cont
 
 ## 🗃️ Modèle de Données & Lifecycles
 
-### 1. Hard Infrastructure (Maps)
-* **Table** : `MapMetadata`. Coordonnées de calibration 2-Pilliers.
-* **Handling** : Source de vérité DB. Exportée vers `maps.json`. Restaurée en premier pour l'ancrage spatial.
+Schéma complet (24 tables) : `backend/src/db/models.py`. Le principe directeur : une seule
+table d'identité (`Person`) et une seule hiérarchie d'organisations/lieux (`Organization`,
+`Location`), avec la **provenance** (qui a écrit cette donnée, et quand) portée par le schéma
+lui-même plutôt que par l'ordre d'exécution des loaders.
+
+### 0. Provenance & Ingestion Governance
+* **Tables** : `DataSource` (registre des systèmes sources — `trombint`, `agenda_ade`, `maisel`,
+  `groupes`, `clubs`, `vault_manual`, `admin_panel`), `IngestionRun` (journal d'audit : un run par
+  invocation de loader, avec statut/compteurs/erreur).
+* **Handling** : Toute ligne hydratée automatiquement porte un `source_id` vers son `DataSource`.
+  C'est ce champ (et non plus l'ordre "vault restauré en dernier") qui garantit qu'un scrape
+  n'écrase jamais une donnée manuelle — voir §2.
+
+### 1. Identity Core (Person)
+* **Table** : `Person` (`kind` : STUDENT / PROFESSOR / ALUMNUS / STAFF / EXTERNAL). Remplace
+  l'ancien `Student` — l'identité n'est plus câblée sur une seule source.
+* **Identifiants externes** : `ExternalIdentity` (`person_id`, `source_id`, `external_id`) —
+  un `Person` peut avoir un identifiant TrombINT, un login CAS, etc., sans jamais toucher à
+  `people`.
+* **Rattachements** : `OrganizationMembership` (école, promo, classe, club, bureau — voir §3) et
+  `PersonHousing` (logement, voir §4) portent tous deux `started_at`/`ended_at` : une synchro
+  **clôture** les rattachements obsolètes (`ended_at`) au lieu de les supprimer, pour préserver
+  l'historique.
 
 ### 2. Human Intelligence (OSINT Research)
-* **Tables** : `SocialLink`, `StudentRelationship`, `Media` (Comms Log).
-* **Handling** : Données créées par l'utilisateur. **Cruciales.** Protégées par le Vault (`data/exports/`). Ne sont jamais écrasées par un scrape automatisé.
+* **Tables** : `SocialLink`, `PersonRelationship`, `Media` (Comms Log).
+* **Handling** : Données créées par l'utilisateur. **Cruciales.** Protégées par le Vault
+  (`data/exports/`), restauré via `source_id = vault_manual` et (pour `PersonRelationship`) un
+  `confidence` (CONFIRMED/LIKELY/UNCONFIRMED) — la garantie "jamais écrasé par un scrape" tient
+  du fait qu'aucun scraper n'écrit dans ces tables, pas d'un ordre d'exécution particulier.
 
-### 3. External Subjects (Directory)
-* **Tables** : `Student`, `Club`, `StudentClub`.
-* **Handling** : Données issues du web. Hydratation (Upsert). Si un sujet disparaît du web, il est marqué `is_active: false` pour préserver ses notes OSINT.
+### 3. Organizations (Schools, Promos, Class Groups, Clubs, Labs, Companies…)
+* **Table** : `Organization`, arbre auto-référentiel (`parent_id`). `kind` : SCHOOL / PROGRAM /
+  PROMO / CLASS_GROUP / CLUB / BUREAU / LAB / COMPANY. Remplace `Club`/`ClassGroup` et
+  l'inférence par regex qui reconstruisait toute la hiérarchie à chaque synchro — l'arbre est
+  maintenant construit une fois (upsert idempotent par niveau) puis seules les
+  `OrganizationMembership` sont resynchronisées.
+* **Handling** : Hydratation web. Si un sujet disparaît du web, il est marqué `is_active: false`
+  pour préserver ses notes OSINT.
+
+### 4. Locations (Buildings, Floors, Rooms, Apartments, Laundry Slots)
+* **Table** : `Location`, arbre auto-référentiel (`parent_id`). `kind` : BUILDING / FLOOR / ROOM /
+  APARTMENT / MACHINE_SLOT / COMMON_AREA. Unifie ce qui était quatre représentations libres
+  différentes (`ApartmentDetail`, `AgendaEvent.room`, `MapMetadata.building_id/floor_id`,
+  `LaundrySubscription.building/machine_nbr`).
+* **Handling** : Champs spécifiques au `kind` (surface/prix pour un APARTMENT, type de machine
+  pour un MACHINE_SLOT…) dans `Location.attributes` (JSON) plutôt que des colonnes dédiées.
 
 ## 📟 Manuel d'Exploitation
 

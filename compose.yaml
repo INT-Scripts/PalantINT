@@ -3,9 +3,9 @@ services:
     image: postgres:18-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:?}
+      POSTGRES_USER: ${POSTGRES_USER:?}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?}
     volumes:
       - ./postgres_data:/var/lib/postgresql
     ports:
@@ -19,12 +19,11 @@ services:
   backend:
     build:
       context: ./backend
-      target: production
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      SECRET_KEY: ${SECRET_KEY}
-      MCP_SERVICE_TOKEN: ${MCP_SERVICE_TOKEN:-internal_mcp_secret_change_me}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:?}:${POSTGRES_PASSWORD:?}@db:5432/${POSTGRES_DB:?}
+      SECRET_KEY: ${SECRET_KEY:?}
+      MCP_SERVICE_TOKEN: ${MCP_SERVICE_TOKEN:?}
     depends_on:
       db:
         condition: service_healthy
@@ -35,7 +34,6 @@ services:
   frontend:
     build:
       context: ./frontend
-      target: production
     restart: unless-stopped
     depends_on:
       - backend
@@ -44,7 +42,7 @@ services:
     image: nginx:alpine
     restart: unless-stopped
     ports:
-      - "${PROXY_PORT}:80"
+      - "${PROXY_PORT:?}:80"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
