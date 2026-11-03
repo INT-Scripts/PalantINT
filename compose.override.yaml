@@ -13,6 +13,8 @@ services:
             - .pytest_cache
         - action: rebuild
           path: ./backend/pyproject.toml
+        - action: rebuild
+          path: ./int-libraries/packages/tsprint/src
 
   frontend:
     build:

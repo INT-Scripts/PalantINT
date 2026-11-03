@@ -15,7 +15,7 @@ flowchart TD
         Laundry["Live Laundry Telemetry (/laundry)"]
         Housing["Housing Specs & Tariffs (/apartments)"]
         Clubs["Accredited Clubs (/clubs)"]
-        Plans["Static Floor Plans SVG (/assets/plans)"]
+        Plans["Floor Plans GeoJSON (/assets/plans)"]
         
         PubAPI --> Laundry
         PubAPI --> Housing
@@ -42,6 +42,15 @@ flowchart TD
     PrivAPI --> DB
 ```
 
+## Contrat de design obligatoire pour les interfaces
+
+Avant toute création ou modification d’interface, lire et appliquer le `DESIGN.md` de l’espace concerné :
+
+* **PalantINT (privé)** : [frontend/src/app/(palantint)/DESIGN.md](frontend/src/app/(palantint)/DESIGN.md). Toute UI privée, notamment la navbar, les cartes 2D/3D, l’accueil, le graphe et l’administration, doit suivre ce contrat.
+* **INT Portal (public)** : [frontend/src/app/(portal)/DESIGN.md](frontend/src/app/(portal)/DESIGN.md). Un composant partagé doit respecter la direction de chacun des deux espaces.
+
+Le design de PalantINT reste sombre, Zinc, monospace pour les contrôles et à angles droits. Préserver les choix explicites documentés : accès campus discret sur l’accueil, cartes principalement visuelles, photogrammétrie active par défaut, absence d’icône d’information générique 3D et de bouton d’export GeoJSON, administration à côté du compte utilisateur. Ne pas réintroduire ces éléments lors d’une refonte. Consigner dans le `DESIGN.md` concerné les nouvelles conventions approuvées par l’utilisateur.
+
 ## 🏛️ INT Portal (Espace Public)
 
 ### Rôle & Vision
@@ -66,7 +75,7 @@ Plateforme d'analyse, d'administration et de cartographie haute précision rése
 
 ### Design System & Esthétique
 * **Palette** : Luxe Professionnel Brutaliste (Zinc-950, néons sombres, DataGrids haute densité).
-* **Interactivité & WebGL** : Jumeau numérique 3D (`BuildingModel`) via Three.js pour le rendu 3D des bâtiments résidentiels. Manipulation directe du DOM (DOM Refs + `setAttribute`) pour les cartes SVG afin de bypasser le cycle React et garantir 60FPS.
+* **Interactivité & WebGL** : Jumeau numérique 3D (`BuildingModel`) via Three.js pour le rendu 3D des bâtiments résidentiels. Plans 2D rendus sur Canvas depuis GeoJSON ; la 3D consomme les mêmes géométries locales. Les SVG sont des sources de conversion uniquement.
 
 ### Modules Privés Principaux
 1. **Annuaire Etudiant & Trombinoscope** : Recherche globale avec photos de profil (`/students/{id}/image`).
@@ -105,6 +114,32 @@ Le backend FastAPI (`backend/src/main.py`) sépare hermétiquement les deux cont
 * **Ingest (Loaders)** : Synchronisent les JSON vers PostgreSQL. Gèrent la fusion (Merge) des données web avec les identités locales.
 * **Vault (Backup)** : Système de sauvegarde portable dans `data/exports/`. Archive la recherche manuelle (Relations, Socials, Notes) et les calibrations de cartes.
 * **TUI** : Interface interactive CLI via `questionary` et `rich`.
+
+### 🗺️ Plans géographiques privés (Wemap)
+* **Collecte** : `palantint_scripts.scrapers.wemap` extrait les tuiles vectorielles et les points d’intérêt de la carte Wemap 29608. Les fragments sont assemblés en GeoJSON WGS84, sans déduire des contours à partir des simples points.
+* **Ingestion** : Domaine `wemap` du pipeline, source `DataSource(code="wemap")`, audit `IngestionRun`, provenance `Location.source_id` et géométries/métadonnées dans `Location.attributes.wemap`. Préserver les identifiants, les occupants et les autres attributs lors des synchronisations.
+* **Interface** : `/palantint/campus` affiche les plans géographiques avec bâtiments, étages et recherche ; la reconstitution 3D et les plans historiques convertis en GeoJSON restent accessibles.
+* **Stockage et accès** : Importer les constantes `WEMAP_DIR`, `WEMAP_IMPORT_DIR` et `GEO_PLANS_DIR` depuis `palantint_scripts.config`. Le GeoJSON consulté est dans `data/private_assets/maps/`, servi uniquement par `/api/private/maps/indoor/*`. Documentation : `docs/wemap-indoor-maps.md`.
+
+### Conversion des plans historiques
+* `palantint_scripts.map_gen` convertit les sources conservées dans `input_svgs/` vers `PLANS_DIR/*.geojson` et un manifeste. Aucun viewer ne doit charger de SVG de plan.
+* Les coordonnées locales sont dans `properties.plan_geometry` ; la géométrie GeoJSON principale reste `null` sans points de contrôle géographiques. Ne jamais interpréter les pixels comme des coordonnées WGS84.
+* Les points de contrôle manuels sont dans `metadata/plan-georeferencing.json` et protégés par le Vault. Contrat et limites : `docs/floor-plan-geojson.md`.
+
+### Autorité des correspondances et état client
+* Les correspondances de lieux, catégories, alias, étages et chemins de plans sont définies par le référentiel serveur et persistées via le seed ou l’ingestion. Ne pas ajouter de tables de correspondance métier dans le client ni d’exceptions de salle dans les routes API.
+* `core/map_reference.json` fournit le référentiel initial ; les règles locales Wemap viennent de `SCRAPS_MANUAL_DIR / metadata / wemap-curations.json`. Les corrections doivent porter leur provenance et préserver géométries source, identités et références existantes. Une correspondance ambiguë doit être signalée.
+* Le client consomme `/maps/catalog`, les champs canoniques `plan`, les catégories/destinations géographiques et `/maps/indoor/registration`. Caméra, filtres et positions temporaires de graphe restent des états de présentation.
+* Les colocations calculées utilisent le même service serveur pour les profils et le graphe ; elles restent distinctes des relations de recherche enregistrées. Le Vault sauvegarde les métadonnées et règles locales dans `map_references.json`.
+* Contrat détaillé : `docs/data-authority-and-pipeline.md`.
+
+### 🖨️ Partage de quota d’impression (followme)
+* Un donneur laisse d’autres membres imprimer sur son compte followme via `tsprint` (`int-libraries`), avec ses identifiants CAS enregistrés. Les montants sont en **pages followme**.
+* Service : `backend/src/services/printing/`. API : `/api/private/print/*`. Interface : `/palantint/print` et `/palantint/admin/print`, avec l’accent `print`.
+* La consommation est dérivée des `PrintRequest` et n’est jamais un compteur. Seul le travail followme nommé `palantint-<id8>-…` d’une demande peut être libéré ou annulé. Contrat : `docs/print-sharing.md`.
+
+### 🤖 Serveur MCP
+* `backend/src/palantint_mcp/` expose l’espace privé en lecture seule sur `/api/mcp/` (jeton `MCP_SERVICE_TOKEN`), principalement pour BananaBot. Conventions des outils (descriptions, pagination, erreurs, consignes ≤ 300 caractères) et liste des outils : `docs/mcp-server.md`.
 
 ## 🗃️ Modèle de Données & Lifecycles
 
@@ -158,6 +193,11 @@ lui-même plutôt que par l'ordre d'exécution des loaders.
 
 ## 📟 Manuel d'Exploitation
 
+### Exécution locale et conteneurs
+Les scripts Python du projet, y compris la collecte et l’ingestion, s’exécutent sur l’hôte depuis le dossier `scripts/`, avec `uv run palantint` ou `uv run <commande>`. `uv` gère leurs dépendances dans l’environnement local du projet. Ne pas créer de service Docker Compose pour les scripts. Cette règle prévaut sur la règle générale ci-dessous pour cet environnement Python.
+
+Les commandes qui utilisent les outils déjà présents dans le dépôt ou sur l'hôte peuvent être exécutées directement : Git, lecture des fichiers, scripts, tests, lint et compilation locale. En revanche, toute opération qui télécharge ou installe des dépendances, construit une image ou modifie l'environnement logiciel doit s'exécuter dans un conteneur Docker, pour ne pas polluer l'hôte. Utiliser `docker compose exec -T <service> ...`, `docker compose run --rm <service> ...` ou une image de build adaptée. Avant une commande locale, vérifier qu'elle n'entraînera pas implicitement d'installation ou de téléchargement (par exemple `npx` sans paquet déjà installé, `uv sync`, `pip install` ou `npm install`).
+
 ### Installation & CLI
 ```bash
 # Dans PalantINT/scripts
@@ -175,7 +215,7 @@ Toute interaction avec l'utilisateur (Web ou CLI) doit utiliser un **Langage Nat
 ```
 data/
 ├── exports/              ← 🔒 Vault (données utilisateur/OSINT persistantes : maps.json, etc.)
-├── assets/               ← 🎨 Ressources statiques web (plans SVG transformés, 3D tiles, logos)
+├── assets/               ← 🎨 Ressources statiques web (plans GeoJSON, 3D tiles, logos)
 └── scraps/               ← 📦 Données sources (découplées en auto/ et manual/)
     ├── auto/             ← 🤖 Données scrapées / générées par scripts
     │   ├── agenda/       ← Emplois du temps JSON (agenda.py)
@@ -197,4 +237,3 @@ data/
 > **Règle d'import des chemins Python** :
 > Ne JAMAIS coder en dur les chemins vers `data/`. Importer systématiquement les constantes centralisées depuis `palantint_scripts.config` :
 > `from palantint_scripts.config import SCRAPS_AUTO_DIR, SCRAPS_MANUAL_DIR, EXPORTS_DIR, ASSETS_DIR, PLANS_DIR`
-

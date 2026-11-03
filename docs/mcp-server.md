@@ -19,7 +19,7 @@ Le serveur MCP expose l’espace privé de PalantINT en lecture seule à des age
 | `client.py` | Client de l’API privée : erreurs reformulées pour le modèle, caches, résolution des étudiants, clubs et groupes |
 | `inputs.py` | Types de paramètres documentés, validation des dates (heure de Paris) |
 | `format.py` | Rendu texte compact, pagination (`page`), troncature signalée (`clip`) |
-| `tools/*.py` | Outils par domaine : annuaire, emplois du temps, clubs, logement |
+| `tools/*.py` | Outils par domaine : annuaire, emplois du temps, clubs, logement, impression |
 
 Tests : `backend/src/tests/test_mcp_tools.py`.
 
@@ -41,6 +41,7 @@ Dans l’ordre où ils sont présentés au modèle :
 | `find_available_rooms` | Salles libres sur un créneau |
 | `get_apartment_info` | Caractéristiques d’un logement Maisel |
 | `get_laundry_status` | Machines libres et occupées (service externe, en direct) |
+| `get_print_sharing_stats` | Totaux du partage de quota d’impression (donneurs, autorisations, pages), sans documents ni noms |
 | `list_reference` | Valeurs admises : salles, bâtiments, promos, écoles, types de relations |
 
 ## Conventions (alignées sur BananaBot)
