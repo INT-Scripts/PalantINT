@@ -37,6 +37,8 @@ services:
     build:
       context: ./frontend
     restart: unless-stopped
+    environment:
+      - PRIVATE_HOST=${PRIVATE_HOST:-}
     depends_on:
       - backend
 

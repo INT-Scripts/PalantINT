@@ -97,6 +97,10 @@ cd scripts/
 uv run palantint-admin admin mypassword # Create root access
 ```
 
+### Private host
+
+Set `PRIVATE_HOST` (for example `ops.example.org`) to serve the operator space on its own host. The public host then redirects `/palantint` and `/login` there, and the private host answers with `X-Robots-Tag: noindex`. Point that host at the same reverse proxy. Unset, a single host serves both spaces. `/api/private` stays reachable from every host and relies on its authentication.
+
 ---
 
 ## 📜 License
