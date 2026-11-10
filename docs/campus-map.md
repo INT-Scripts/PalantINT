@@ -51,6 +51,15 @@ Le loader enregistre chaque placement (ou la raison de son absence) sur l’éta
 
 État au 2026-11-10 : 28 plans sur 37 placés (U1–U4 par numéros, RMS 0,2–1,3 m ; U7 et Foyer par formes). U5 (correspondance insuffisante) et U6 (absent de Wemap et d’OSM) restent sur Wemap.
 
+## Logements et Foyer dans le panneau
+
+La carte remplace les anciennes pages `/palantint/apartments` et `/palantint/foyer`.
+
+- Logement : `/api/private/maps/indoor/locations/{id}` renvoie, pour un `Location` APARTMENT, un bloc `apartment` typé (type, surface, loyer, aides boursier/non boursier et loyers nets) lu dans ses attributs Maisel. Les données Maisel ne contiennent pas de critère PMR ; seule l’accessibilité Wemap (`wheelchair`) est affichée lorsqu’elle existe.
+- Résidence : `/api/private/maps/indoor/housing` résume chaque résidence (logements, occupés, nombre et fourchette de loyers par type).
+- Foyer : les salles dessinées du Foyer portent leurs associations (`clubs` : identifiant, nom, logo) depuis `build_foyer_index`.
+- Anciens liens : le proxy Next redirige (307) les deux pages vers `/palantint/campus?building=…&level=…&feature=…`. `/api/private/maps/indoor/legacy` traduit `bldg`, `floor` (étage du plan historique) et `room` à partir des placements ingérés, sinon de Wemap, sinon du seul bâtiment. La carte utilise ce même service pour un paramètre `room` qu’elle ne trouve pas parmi les salles dessinées.
+
 ## Relief et photogrammétrie
 
 Le relief IGN est découpé en cellules z18 (≈ 100 m) : maillage de 129×129 nœuds et texture 20 cm sur le campus, 65×65 et 256 px autour. La surface est le terrain (MNT) plus la hauteur de sursol (MNH) lissée par une médiane 3×3 sans couture entre tuiles, exprimée par rapport au sol du campus (`ground_reference_m` de l’index, MNT médian de la cellule centrale) : le campus repose sur la carte plane et les alentours conservent leur relief réel.
