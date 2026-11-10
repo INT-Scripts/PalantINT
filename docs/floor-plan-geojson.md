@@ -43,11 +43,11 @@ Ces valeurs illustrent le format, pas une calibration du campus. La conversion a
 
 Les deux piliers de calibration 3D existants restent en pourcentages de plan et conservent leur rôle. Ils ne remplacent pas trois points géographiques mesurés. Un fond de carte géographique pourra être ajouté sous les plans placés, avec une source de tuiles et son attribution adaptées.
 
-## Plans de référence dans la scène 3D
+## Placement sur la carte du campus
 
-`GET /api/private/maps/3d-overlays` associe le catalogue de plans aux marqueurs calibrés et aux bâtiments Wemap côté serveur. Le rendu préfère ces plans lorsque tous les dessins nécessaires au bâtiment sélectionné ont été chargés ; sinon il conserve les géométries Wemap. Les coordonnées de scène enregistrées (`position`, `rotation`, `scale`, `floor_height`) sont appliquées telles quelles, avec les calibrations de piliers par étage. Ces placements de scène ne sont pas assimilés à des coordonnées WGS84.
+Sans points de contrôle manuels, `uv run palantint other georef` estime le placement de chaque plan à partir de Wemap (numéros de salle communs, sinon formes des salles) et l’écrit dans un fichier privé. La carte `/palantint/campus` dessine alors ces plans à la place des salles Wemap qu’ils couvrent, en 2D comme en 3D. Méthodes, seuils et état : `campus-map.md`.
 
-Les pièces du niveau actif sont sélectionnables et ouvrent leur plan détaillé. Les niveaux historiques gardent leurs valeurs et leurs libellés propres ; ils ne sont pas convertis arbitrairement en niveaux Wemap. Les liens directs vers une salle Wemap conservent ce contexte géographique.
+Les alignements 3D ci-dessous (marqueurs et piliers) restent utilisés par l’administration et pour placer le scan photogrammétrique du campus.
 
 ### Récupérer les alignements déployés
 

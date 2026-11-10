@@ -49,7 +49,7 @@ Avant toute création ou modification d’interface, lire et appliquer le `DESIG
 * **PalantINT (privé)** : [frontend/src/app/(palantint)/DESIGN.md](frontend/src/app/(palantint)/DESIGN.md). Toute UI privée, notamment la navbar, les cartes 2D/3D, l’accueil, le graphe et l’administration, doit suivre ce contrat.
 * **INT Portal (public)** : [frontend/src/app/(portal)/DESIGN.md](frontend/src/app/(portal)/DESIGN.md). Un composant partagé doit respecter la direction de chacun des deux espaces.
 
-Le design de PalantINT reste sombre, Zinc, monospace pour les contrôles et à angles droits. Préserver les choix explicites documentés : accès campus discret sur l’accueil, cartes principalement visuelles, photogrammétrie active par défaut, absence d’icône d’information générique 3D et de bouton d’export GeoJSON, administration à côté du compte utilisateur. Ne pas réintroduire ces éléments lors d’une refonte. Consigner dans le `DESIGN.md` concerné les nouvelles conventions approuvées par l’utilisateur.
+Le design de PalantINT reste sombre, Zinc, monospace pour les contrôles et à angles droits. Préserver les choix explicites documentés : accès campus discret sur l’accueil, cartes principalement visuelles, photogrammétrie toujours présente en 3D (sélecteur de vue unique Plan/Satellite/3D), panneau latéral de sélection sans sélecteur de bâtiment, absence d’icône d’information générique 3D et de bouton d’export GeoJSON, administration à côté du compte utilisateur. Ne pas réintroduire ces éléments lors d’une refonte. Consigner dans le `DESIGN.md` concerné les nouvelles conventions approuvées par l’utilisateur.
 
 ## 🏛️ INT Portal (Espace Public)
 
@@ -118,11 +118,12 @@ Le backend FastAPI (`backend/src/main.py`) sépare hermétiquement les deux cont
 ### 🗺️ Plans géographiques privés (Wemap)
 * **Collecte** : `palantint_scripts.scrapers.wemap` extrait les tuiles vectorielles et les points d’intérêt de la carte Wemap 29608. Les fragments sont assemblés en GeoJSON WGS84, sans déduire des contours à partir des simples points.
 * **Ingestion** : Domaine `wemap` du pipeline, source `DataSource(code="wemap")`, audit `IngestionRun`, provenance `Location.source_id` et géométries/métadonnées dans `Location.attributes.wemap`. Préserver les identifiants, les occupants et les autres attributs lors des synchronisations.
-* **Interface** : `/palantint/campus` affiche les plans géographiques avec bâtiments, étages et recherche ; la reconstitution 3D et les plans historiques convertis en GeoJSON restent accessibles.
+* **Interface** : `/palantint/campus` est une seule carte MapLibre dont le plan et la vue 3D sont deux modes de rendu. Elle combine Wemap, les plans historiques placés géographiquement (numéros faisant foi), le fond OpenStreetMap, l’orthophoto IGN, le scan photogrammétrique du campus et le relief LiDAR IGN des alentours. Sources, commandes et garde-fous : `docs/campus-map.md`.
 * **Stockage et accès** : Importer les constantes `WEMAP_DIR`, `WEMAP_IMPORT_DIR` et `GEO_PLANS_DIR` depuis `palantint_scripts.config`. Le GeoJSON consulté est dans `data/private_assets/maps/`, servi uniquement par `/api/private/maps/indoor/*`. Documentation : `docs/wemap-indoor-maps.md`.
 
 ### Conversion des plans historiques
 * `palantint_scripts.map_gen` convertit les sources conservées dans `input_svgs/` vers `PLANS_DIR/*.geojson` et un manifeste. Aucun viewer ne doit charger de SVG de plan.
+* Domaine `plan_georeference` du pipeline : `palantint_scripts.plan_registration` calcule le placement des plans à partir de Wemap (`PLAN_REGISTRATION_PATH`, dans `scraps/auto/`), puis `loaders.plan_georeference` l’ingère dans `Location.attributes.plan_georeference` des étages de plan (source `DataSource(code="plan_georeference")`, audit `IngestionRun`). Le serveur l’applique via `/api/private/maps/indoor/plans` ; les fichiers publics des plans ne reçoivent jamais ces coordonnées.
 * Les coordonnées locales sont dans `properties.plan_geometry` ; la géométrie GeoJSON principale reste `null` sans points de contrôle géographiques. Ne jamais interpréter les pixels comme des coordonnées WGS84.
 * Les points de contrôle manuels sont dans `metadata/plan-georeferencing.json` et protégés par le Vault. Contrat et limites : `docs/floor-plan-geojson.md`.
 
@@ -205,6 +206,9 @@ uv sync
 uv run palantint # Interface interactive TUI
 ```
 
+### Commits fréquents
+Committer souvent, par petites étapes cohérentes, sans attendre la fin d’une tâche : une unité fonctionnelle vérifiée (tests, typage, lint) donne un commit. Travailler sur une branche dédiée à la tâche plutôt que sur `main` ou une branche sans rapport. Dans chaque sous-module modifié (`backend`, `frontend`, `scripts`, `int-libraries`), committer d’abord dans le sous-module, puis mettre à jour son pointeur dans le dépôt parent. Séparer les changements sans rapport (par exemple un `uv.lock` régénéré) dans leur propre commit. Ne jamais committer de données (`data/`), de secrets ou d’identifiants.
+
 ### Mandat de Langage
 Toute interaction avec l'utilisateur (Web ou CLI) doit utiliser un **Langage Naturel Professionnel**. 
 * ❌ "Deploy Operative", "Extraction Velocity", "ID_REF"
@@ -237,3 +241,4 @@ data/
 > **Règle d'import des chemins Python** :
 > Ne JAMAIS coder en dur les chemins vers `data/`. Importer systématiquement les constantes centralisées depuis `palantint_scripts.config` :
 > `from palantint_scripts.config import SCRAPS_AUTO_DIR, SCRAPS_MANUAL_DIR, EXPORTS_DIR, ASSETS_DIR, PLANS_DIR`
+> Carte du campus : archives `BASEMAP_ARCHIVE_DIR`, `IGN_ARCHIVE_DIR`, `PLAN_REGISTRATION_PATH` ; produits publiés `GEO_PLANS_DIR`, `BASEMAP_PATH`, `AERIAL_DIR`, `RELIEF_DIR`. Les domaines `basemap` et `ign` du pipeline archivent les téléchargements bruts et peuvent tout reconstruire hors ligne.
