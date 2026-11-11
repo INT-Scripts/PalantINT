@@ -208,7 +208,7 @@ uv run palantint # Interface interactive TUI
 ```
 
 ### Commits fréquents
-Committer souvent, par petites étapes cohérentes, sans attendre la fin d’une tâche : une unité fonctionnelle vérifiée (tests, typage, lint) donne un commit. Travailler sur une branche dédiée à la tâche plutôt que sur `main` ou une branche sans rapport. Dans chaque sous-module modifié (`backend`, `frontend`, `scripts`, `int-libraries`), committer d’abord dans le sous-module, puis mettre à jour son pointeur dans le dépôt parent. Séparer les changements sans rapport (par exemple un `uv.lock` régénéré) dans leur propre commit. Ne jamais committer de données (`data/`), de secrets ou d’identifiants.
+Committer souvent, par petites étapes cohérentes, sans attendre la fin d’une tâche : une unité fonctionnelle vérifiée (tests, typage, lint) donne un commit. Travailler directement sur `main`, sans créer de branche (contributeur unique). Dans chaque sous-module modifié (`backend`, `frontend`, `scripts`, `int-libraries`), committer d’abord dans le sous-module, puis mettre à jour son pointeur dans le dépôt parent. Séparer les changements sans rapport (par exemple un `uv.lock` régénéré) dans leur propre commit. Ne jamais committer de données (`data/`), de secrets ou d’identifiants.
 
 ### Mandat de Langage
 Toute interaction avec l'utilisateur (Web ou CLI) doit utiliser un **Langage Naturel Professionnel**. 
