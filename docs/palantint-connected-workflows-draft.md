@@ -46,7 +46,7 @@ L'emploi du temps est le meilleur premier cas. Il permet de sélectionner plusie
 - L'agenda d'une personne ouvre la comparaison sur sa semaine. Le détail d'un événement peut ouvrir la comparaison avec sa salle.
 - Les personnes sélectionnées dans la comparaison ouvrent leur fiche, et un lien vers la sélection peut être copié.
 - La recherche globale ouvre les associations dans la modale existante et offre une action « Comparer » pour les personnes connectées.
-- Le lien salle → plan reste à traiter : les salles de l'agenda sont encore exposées par libellé et aucun rattachement fiable aux plans n'a été établi dans cette vue.
+- Le détail d'un événement et la salle choisie dans l'emploi du temps ouvrent la salle sur le campus (« Voir sur le plan ») quand `/maps/indoor/lookup` la résout vers une seule entité : environ 78 % des événements en novembre 2026. Les salles restantes (bâtiments E et M, F020, 3A…) n'ont pas d'entité Wemap ; un alias de curation ou un plan dessiné les rattachera.
 
 ## Critères de validation
 
