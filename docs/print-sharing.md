@@ -51,4 +51,4 @@ L’image backend reçoit `int-libraries` comme contexte de build supplémentair
 
 ## Pistes non réalisées
 
-- Afficher les imprimantes sur `/palantint/campus`. Cela demande une correspondance explicite entre imprimante et lieu, dans le référentiel serveur des lieux.
+- Imprimantes sur la carte : le référentiel serveur (`core/map_reference.json`, `print_points`) rattache chaque imprimante followme à un lieu Wemap ; le seed l’enregistre dans `Location.attributes.printing`. Les quatre imprimantes `MFP-I1-*` sont aux copieurs étudiants de NOVA – Bâtiment I, niveau 1 (confirmé le 2026-11-11). La fiche du lieu propose « Imprimer » ; à la libération, chaque imprimante rattachée renvoie vers son lieu sur le campus. L’état d’une imprimante n’est lisible par followme qu’avec un document en attente : la carte ne l’affiche donc pas. Une position individuelle par imprimante pourra remplacer le point commun.

@@ -84,7 +84,7 @@ Actions qui croisent la carte avec le reste de PalantINT. Chacune reste un geste
 
 ## Plus tard
 
-- **Imprimer** (`Printer`) : vers `/palantint/print`, pour un point d’impression. Nécessite d’abord une correspondance serveur entre imprimantes `tsprint` et lieux ; aucune action ne doit prétendre la rendre disponible avant (voir `palantint-map-workspace.md`).
+- **Imprimer** (`Printer`) : livré le 2026-11-11 pour les points d’impression du référentiel serveur (voir `print-sharing.md`).
 - **Laverie** : interdite dans la fiche d’un lieu par `DESIGN.md` ; elle reste dans la vue bâtiment.
 
 ## Priorité proposée
