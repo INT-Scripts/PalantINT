@@ -14,7 +14,41 @@ La commande de conversion reste disponible dans `uv run palantint`. La vérifica
 
 La conversion conserve les identifiants des textes, les murs, les courbes échantillonnées, les transformations et les trous des polygones. Les régions fermées sont extraites par composantes connexes à deux pixels par unité source ; `extraction_tolerance` indique la précision. Une zone ouverte ou partagée par plusieurs identifiants reste un point à vérifier, sans rectangle inventé.
 
-L’état initial comprend **37 plans, 899 identifiants et 894 polygones de salles**. Cinq contours restent à corriger dans les sources : `2535`, `2534` (U2, étage 5), `5405`, `5404`, `5403` (U5, étage 4). Le manifeste liste ces identifiants par plan.
+L’état initial comprend **37 plans, 899 identifiants et 894 polygones de salles**, plus 238 espaces sans numéro détectés automatiquement. Cinq contours restent à corriger dans les sources : `2535`, `2534` (U2, étage 5), `5405`, `5404`, `5403` (U5, étage 4). Le manifeste liste ces identifiants par plan.
+
+## Couloirs, escaliers et espaces sans numéro
+
+Les SVG ne nomment que les chambres et salles numérotées. La conversion ajoute aussi :
+
+- un `floor` par plan : la dalle de l’étage, union des zones fermées (murs compris), sans les zones marquées « vide » ;
+- un espace (`space`) pour chaque zone fermée restante d’au moins 100 unités², identifiant `auto-<x>-<y>` (point intérieur), `extraction = "unlabelled_enclosure"` ;
+- les espaces définis à la main : `corridor`, `stairs`, `elevator` ou `space`, avec `space_id`, un `name` facultatif et `extraction = "defined"`. Leur identifiant de feature est `plan:<bâtiment>:<étage>:space:<id>`, quel que soit leur type.
+
+Les définitions sont dans `PLAN_SPACES_PATH` (`SCRAPS_MANUAL_DIR / "metadata" / "plan-spaces.json"`), source manuelle sauvegardée par le Vault (`map_references.json`, restaurée seulement si le fichier manque) :
+
+```json
+{
+  "U7_2": {
+    "partitions": [[[323.3, 298.6], [323.3, 351.0]]],
+    "spaces": [
+      {"id": "corridor-1", "kind": "corridor", "name": "Couloir", "point": [380, 320]},
+      {"id": "void-1", "kind": "void", "point": [500, 600]}
+    ]
+  }
+}
+```
+
+Chaque espace prend la zone fermée sous son `point`. Une `partition` est une cloison tracée seulement dans le raster d’extraction, pour séparer deux zones ou fermer une zone ouverte. Elle n’est jamais publiée comme mur et sert aussi aux contours de salles. `void` retire la zone du sol (patio, jardin, gaine). Un point sur une salle numérotée, hors du bâtiment ou dans une zone partagée reste un point listé dans `metadata.unresolved_spaces`.
+
+Éditeur local, depuis `scripts/` :
+
+```sh
+uv run palantint other spaces   # http://127.0.0.1:8765/
+```
+
+Cliquer sur une zone grisée pour la qualifier (touches `1`–`5`), `C` pour tracer une cloison (aimantée aux murs, `Maj` pour enchaîner), `N` pour placer un espace à la main. L’aperçu se recalcule à chaque modification. `Ctrl+S` enregistre le fichier et régénère le GeoJSON du plan et le manifeste.
+
+La carte du campus dessine ces espaces comme les circulations Wemap (2D et 3D) ; seules les salles numérotées restent sélectionnables. `plan_registration` n’utilise que les salles.
 
 ## Coordonnées et placement géographique
 

@@ -126,6 +126,7 @@ Le backend FastAPI (`backend/src/main.py`) sépare hermétiquement les deux cont
 * Domaine `plan_georeference` du pipeline : `palantint_scripts.plan_registration` calcule le placement des plans à partir de Wemap (`PLAN_REGISTRATION_PATH`, dans `scraps/auto/`), puis `loaders.plan_georeference` l’ingère dans `Location.attributes.plan_georeference` des étages de plan (source `DataSource(code="plan_georeference")`, audit `IngestionRun`). Le serveur l’applique via `/api/private/maps/indoor/plans` ; les fichiers publics des plans ne reçoivent jamais ces coordonnées.
 * Les coordonnées locales sont dans `properties.plan_geometry` ; la géométrie GeoJSON principale reste `null` sans points de contrôle géographiques. Ne jamais interpréter les pixels comme des coordonnées WGS84.
 * Les points de contrôle manuels sont dans `metadata/plan-georeferencing.json` et protégés par le Vault. Contrat et limites : `docs/floor-plan-geojson.md`.
+* Couloirs, escaliers, ascenseurs et locaux sans numéro : zones fermées détectées automatiquement (`space`) et dalle d’étage (`floor`), qualifiées et cloisonnées dans `PLAN_SPACES_PATH` (`metadata/plan-spaces.json`, Vault) avec l’éditeur local `uv run palantint other spaces`.
 
 ### Autorité des correspondances et état client
 * Les correspondances de lieux, catégories, alias, étages et chemins de plans sont définies par le référentiel serveur et persistées via le seed ou l’ingestion. Ne pas ajouter de tables de correspondance métier dans le client ni d’exceptions de salle dans les routes API.
