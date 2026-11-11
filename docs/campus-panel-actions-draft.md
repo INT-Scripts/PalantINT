@@ -40,6 +40,48 @@ Rien n’est implémenté. À valider avant de reporter les actions retenues dan
 | --- | --- | --- | --- | --- |
 | Corriger | `PencilLine` | utilisateur administrateur | page d’administration des cartes, sur ce lieu, pour signaler ou corriger une correspondance | `location_id` |
 
+## Pistes plus ambitieuses
+
+Actions qui croisent la carte avec le reste de PalantINT. Chacune reste un geste unique dans la rangée ; le résultat s’affiche sur la carte ou dans le module concerné.
+
+### Logement
+
+| Action | Icône | Effet | Données |
+| --- | --- | --- | --- |
+| Localiser | `Crosshair` | la carte vole vers la salle où l’occupant a cours maintenant (ou son prochain cours, avec l’heure) | agenda étudiant, résolution des salles |
+| Anciens occupants | `History` | liste chronologique des résidents passés du logement | `PersonHousing` clôturés (`ended_at`) : l’historique est déjà conservé |
+| Cercle | `Waypoints` | colore sur la carte les logements de toutes les personnes liées à l’occupant (relations, colocs, même groupe) | `PersonRelationship`, adhésions, `PersonHousing` |
+| Même promo | `GraduationCap` | surligne les logements de la résidence occupés par la même promo ou le même groupe de TD | `OrganizationMembership` |
+| Ajouter une relation | `Link` | relation pré-remplie entre l’occupant et un voisin ou un colocataire (type « Coloc ») | relations de recherche (Vault) |
+| Note | `NotebookPen` | note de recherche rattachée à l’occupant, sans quitter la carte | `Media` (journal) |
+| Alerte libération | `BellRing` | prévient quand le logement devient libre | notifications existantes (laverie), à étendre au logement |
+
+### Salle d’enseignement
+
+| Action | Icône | Effet | Données |
+| --- | --- | --- | --- |
+| Qui y était | `UserSearch` | groupes et étudiants présents dans la salle à un créneau donné (par défaut : maintenant) | événements de la salle × groupes pédagogiques |
+| Groupes de la semaine | `UsersRound` | les groupes qui utilisent la salle cette semaine, avec lien vers chacun | événements de la salle |
+| Créneau commun | `CalendarCheck` | ouvre l’emploi du temps avec la salle et les étudiants choisis, pour trouver un créneau où tous sont libres et la salle aussi | comparaison d’agendas existante |
+| Trajet du cours | `Route` | trace les logements de tous les étudiants du cours en cours vers la salle | groupes × `PersonHousing` |
+
+### Local associatif
+
+| Action | Icône | Effet | Données |
+| --- | --- | --- | --- |
+| Où vivent les membres | `MapPinned` | colore les logements des membres de l’association (bureau en premier) | adhésions × `PersonHousing` |
+| Bureau | `Crown` | membres du bureau avec lien vers leurs fiches | `Organization` kind BUREAU |
+
+### Toute fiche
+
+| Action | Icône | Effet | Données |
+| --- | --- | --- | --- |
+| Épingler | `Pin` | garde le lieu en marqueur sur la carte d’une visite à l’autre, pour comparer ou revenir | état de présentation, propre à l’utilisateur |
+| Vue immersive | `Eye` | caméra à hauteur d’homme dans la photogrammétrie, devant le lieu | scan 3D, `PITCH` maximal |
+| Imprimer le plan | `Printer` | envoie l’étage, avec le lieu surligné, sur le compte d’impression partagé ; à retirer à n’importe quelle imprimante followme | partage d’impression (`/api/private/print`) |
+| Demander à BananaBot | `Bot` | ouvre une conversation sur ce lieu (occupants, agenda, historique) | serveur MCP en lecture seule |
+| QR code | `QrCode` | code du lien de la fiche, à afficher ou imprimer sur une porte | URL courante |
+
 ## Plus tard
 
 - **Imprimer** (`Printer`) : vers `/palantint/print`, pour un point d’impression. Nécessite d’abord une correspondance serveur entre imprimantes `tsprint` et lieux ; aucune action ne doit prétendre la rendre disponible avant (voir `palantint-map-workspace.md`).
