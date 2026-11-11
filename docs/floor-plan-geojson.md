@@ -39,7 +39,7 @@ Le fichier facultatif `SCRAPS_MANUAL_DIR / "metadata" / "plan-georeferencing.jso
 }
 ```
 
-Ces valeurs illustrent le format, pas une calibration du campus. La conversion ajuste une transformation affine en mètres, refuse une erreur RMS supérieure à 3 m et renseigne sa provenance. Les géométries locales sont conservées même après placement. Le Vault sauvegarde ces points et restaure le fichier seulement s’il manque, sans écraser une version locale plus récente.
+Ces valeurs illustrent le format, pas une calibration du campus. Le calcul de placement (`plan_registration`, domaine `plan_georeference`) ajuste une similitude en mètres, refuse une erreur RMS supérieure à 3 m et enregistre le placement (méthode `control_points`) avec les autres, en privé : `map_gen` n’écrit jamais ces coordonnées dans les fichiers publics. Sans niveau Wemap, un étage placé manuellement prend la valeur de son étage de plan. Le Vault sauvegarde ces points et restaure le fichier seulement s’il manque, sans écraser une version locale plus récente.
 
 Les deux piliers de calibration 3D existants restent en pourcentages de plan et conservent leur rôle. Ils ne remplacent pas trois points géographiques mesurés. Un fond de carte géographique pourra être ajouté sous les plans placés, avec une source de tuiles et son attribution adaptées.
 
