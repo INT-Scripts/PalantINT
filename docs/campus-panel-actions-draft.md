@@ -2,7 +2,7 @@
 
 La fiche d’un lieu de `/palantint/campus` affiche sous son en-tête une **rangée d’actions libellées** (`Action` dans `CampusPanel.tsx`) : « Agenda », « Disponibilités », « Copier le lien ». Chaque action est une icône carrée avec un libellé court ; un seul geste l’exécute. Les propositions ci-dessous suivent ce format. Elles n’apparaissent que lorsque leur condition est remplie, pour ne pas ajouter de contrôle sans action utile (`DESIGN.md`).
 
-Rien n’est implémenté. À valider avant de reporter les actions retenues dans `DESIGN.md`.
+État au 2026-11-11 : les actions retenues sont livrées et consignées dans `DESIGN.md` (Agenda, Présents, Groupes ; Disponibilités, Localiser, Cercle, Même promo, Historique, Note ; Membres ; Vue immersive, Signet, Copier le lien). Les autres propositions ci-dessous restent à valider avant toute implémentation.
 
 ## Toute fiche
 
