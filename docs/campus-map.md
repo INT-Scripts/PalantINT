@@ -49,15 +49,16 @@ Les points de contrôle manuels (`plan-georeferencing.json`, voir `floor-plan-ge
 
 Le loader enregistre chaque placement (ou la raison de son absence) sur l’étage concerné, sans toucher aux autres attributs. Le serveur (`services/plan_geography.py`) applique ces transformations aux fichiers publics des plans, relie les logements à leur `Location` et les salles du Foyer à leurs associations, et signale les lieux Wemap couverts (`metadata.superseded`) que la carte n’affiche plus. Les géométries WGS84 obtenues restent privées.
 
-État au 2026-11-11 : 33 plans sur 37 placés (U1–U4 par numéros, RMS 0,2–1,3 m ; U7 et Foyer par formes ; U5 étages 0.5 à 4 par points de contrôle manuels, validés sur l’orthophoto, dérivés de l’ajustement au contour OSM de U5 puis de l’alignement des étages entre eux). Le sous-sol de U5 (ajustement ambigu) et U6 (absent de Wemap et d’OSM, non identifié sur l’orthophoto) restent non placés.
+État au 2026-11-11 : 34 plans sur 37 placés (U1–U4 par numéros, RMS 0,2–1,3 m ; U7 et Foyer par formes ; U5, tous ses étages, par points de contrôle manuels validés sur l’orthophoto, dérivés de l’ajustement au contour OSM de U5 puis de l’alignement des étages entre eux ; le sous-sol, ajusté sur les salles de l’étage 2, reste incertain : environ 8° d’écart). U6 n’est pas sur le campus : d’après la carte Maisel, c’est une barre nord–sud à l’est de la cathédrale d’Évry, hors de l’emprise de la carte. Il n’est volontairement pas placé et s’affiche à part (voir ci-dessus).
 
 ## Logements et Foyer dans le panneau
 
 La carte remplace les anciennes pages `/palantint/apartments` et `/palantint/foyer`.
 
-- Logement : `/api/private/maps/indoor/locations/{id}` renvoie, pour un `Location` APARTMENT, un bloc `apartment` typé (type, surface, loyer, aides boursier/non boursier et loyers nets) lu dans ses attributs Maisel. Les données Maisel ne contiennent pas de critère PMR ; seule l’accessibilité Wemap (`wheelchair`) est affichée lorsqu’elle existe.
+- Logement : `/api/private/maps/indoor/locations/{id}` renvoie, pour un `Location` APARTMENT, un bloc `apartment` typé (type, surface, loyer, aides boursier/non boursier et loyers nets) lu dans ses attributs Maisel. Aucune source n’indique les logements adaptés PMR (personnes à mobilité réduite) : ni les fiches Maisel ni ses plans, ni `apartments.txt`/`apartments.csv`, ni les SVG (vérifié le 2026-11-11). Seule l’accessibilité Wemap (`wheelchair`) est affichée lorsqu’elle existe.
 - Résidence : `/api/private/maps/indoor/housing` résume chaque résidence (logements, occupés, nombre et fourchette de loyers par type).
 - Foyer : les salles dessinées du Foyer portent leurs associations (`clubs` : identifiant, nom, logo) depuis `build_foyer_index`.
+- Résidence hors carte : `/api/private/maps/indoor/local-plans` sert les plans des résidences dont aucun étage n’est placé (U6), en coordonnées de plan, reliés à leurs logements comme `/plans`. La carte les dessine à part (canvas) avec le même panneau.
 - Anciens liens : le proxy Next redirige (307) les deux pages vers `/palantint/campus?building=…&level=…&feature=…`. `/api/private/maps/indoor/legacy` traduit `bldg`, `floor` (étage du plan historique) et `room` à partir des placements ingérés, sinon de Wemap, sinon du seul bâtiment. La carte utilise ce même service pour un paramètre `room` qu’elle ne trouve pas parmi les salles dessinées.
 
 ## Relief et photogrammétrie
